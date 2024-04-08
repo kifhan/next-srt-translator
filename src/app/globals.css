@@ -2,32 +2,32 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Light theme */
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
+  --color-bg: #ffffff;
+  --color-text: #000000;
+  --color-primary: #1a202c;
+  --color-secondary: #2d3748;
+  --color-accent: #4a5568;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+  --color-btn-bg: #3b82f6;
+  --color-btn-text: #ffffff;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-primary);
+}
+
+a {
+  color: var(--color-accent);
+}
+
+button {
+  background-color: var(--color-btn-bg);
+  color: var(--color-btn-text);
 }

@@ -12,6 +12,7 @@ import TranslationController, { TranslationEvent } from "@/utils/TranslationCont
 import ProgressBar from "@/components/ProgressBar";
 
 import githubLogo from "@/assets/github-mark.png";
+import Image from "next/image";
 
 export default function Home() {
   const [language, setLanguage] = useState("Traditional Chinese");
@@ -50,6 +51,29 @@ export default function Home() {
 
     const controller = new TranslationController(originalSRTText, language);
     translationControllerRef.current = controller;
+
+    controller.on('progress', (event: TranslationEvent) => {
+      console.log('progress', event.data.progress);
+      setTranslateProgress(event.data.progress);
+      setTranslatedSRTText(event.data.translatedSRTText);
+    });
+    controller.on('complete', (event: TranslationEvent) => {
+      setTranslateProgress(event.data.progress);
+      setTranslatedSRTText(event.data.translatedSRTText);
+      setIsTranslating(false);
+    });
+    controller.on('stop', () => {
+      setIsTranslating(false);
+      setIsPaused(false);
+    });
+    controller.on('pause', () => {
+      setIsTranslating(false);
+      setIsPaused(true);
+    });
+    controller.on('resume', () => {
+      setIsTranslating(true);
+      setIsPaused(false);
+    });
     controller.on('start', () => {
       setIsTranslating(true);
       setIsPaused(false);
@@ -94,6 +118,12 @@ export default function Home() {
   const onStopTranslate = () => {
     if (translationControllerRef.current) {
       translationControllerRef.current.stop();
+      translationControllerRef.current.off('progress');
+      translationControllerRef.current.off('complete');
+      translationControllerRef.current.off('start');
+      translationControllerRef.current.off('stop');
+      translationControllerRef.current.off('pause');
+      translationControllerRef.current.off('resume');
       translationControllerRef.current = undefined;
       setIsTranslating(false);
       setIsPaused(false);
@@ -139,60 +169,12 @@ export default function Home() {
     setTranslatedSRT(srt);
   }, [translatedSRTText]);
 
-  useEffect(() => {
-    if (!translationControllerRef.current) return;
-    console.log('controller changed');
-
-    const controller = translationControllerRef.current;
-
-    controller.on('progress', (event: TranslationEvent) => {
-      console.log('progress', event.data.progress);
-      setTranslateProgress(event.data.progress);
-      setTranslatedSRTText(event.data.translatedSRTText);
-    });
-
-    controller.on('complete', (event: TranslationEvent) => {
-      setTranslateProgress(event.data.progress);
-      setTranslatedSRTText(event.data.translatedSRTText);
-      setIsTranslating(false);
-    });
-
-
-    controller.on('stop', () => {
-      setIsTranslating(false);
-      setIsPaused(false);
-    });
-    controller.on('pause', () => {
-      setIsTranslating(false);
-      setIsPaused(true);
-    });
-    controller.on('resume', () => {
-      setIsTranslating(true);
-      setIsPaused(false);
-    });
-
-
-    return () => {
-      if (translationControllerRef.current) {
-        translationControllerRef.current.off('progress');
-        translationControllerRef.current.off('complete');
-        translationControllerRef.current.off('start');
-        translationControllerRef.current.off('stop');
-        translationControllerRef.current.off('pause');
-        translationControllerRef.current.off('resume');
-        translationControllerRef.current.stop();
-        translationControllerRef.current = undefined;
-      }
-    }
-  }, [translationControllerRef.current]);
-
-
   return (
     <main className="flex min-h-screen flex-col p-6 gap-2">
       <div className="flex items-center justify-between w-full">
         <h1 className="text-2xl font-bold">SRT Translator /w chatgpt</h1>
         <a href="https://github.com/kifhan/next-srt-translator" target="_blank" rel="noopener noreferrer">
-          <img src={githubLogo.src} alt="GitHub" className="w-8 h-8" />
+          <Image src={githubLogo.src} alt="GitHub" className="w-8 h-8" />
         </a>
       </div>
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex  grow-0">
@@ -219,7 +201,7 @@ export default function Home() {
             {isTranslating ? <ControlButton label="Pause" color="bg-yellow-500" onClick={() => translationControllerRef.current?.pause()} /> : null}
             {isPaused ? <ControlButton label="Resume" color="bg-green-500" onClick={() => translationControllerRef.current?.resume()} /> : null}
 
-            {/* {translationControllerRef.current ? <ControlButton label="Stop" color="bg-red-500" onClick={onStopTranslate} /> : null} */}
+            {translationControllerRef.current ? <ControlButton label="Stop" color="bg-red-500" onClick={onStopTranslate} /> : null}
 
           </div>
           <FileDownloadButton label="Download" onClick={onDownload} disabled={!translatedSRT} />

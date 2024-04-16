@@ -34,7 +34,7 @@ const TextArea: React.FC<TextAreaProps> = ({
 
         const maxLength = value.split('\n').reduce((max, line) => Math.max(max, line.length), 0);
         setCols(Math.max(minCols, maxLength));
-    }, [value, minRows]);
+    }, [value, minRows, minCols]);
 
     return (
         <div className="flex flex-col w-full">

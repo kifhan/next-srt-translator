@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import TranslatorConfig from "@/sections/TranslatorConfig";
 import FileUploadButton from "@/components/FileUploadButton";
 import FileDownloadButton from "@/components/ControlButton";
@@ -8,68 +8,57 @@ import SRTTable, { SRT } from "@/components/srt/SRTTable";
 import { splitText, translateText } from "@/utils/srt_process";
 import ControlButton from "@/components/ControlButton";
 
+import TranslationController, { TranslationEvent } from "@/utils/TranslationController";
+import ProgressBar from "@/components/ProgressBar";
+
+import githubLogo from "@/assets/github-mark.png";
+
 export default function Home() {
-  const [language, setLanguage] = useState("en");
+  const [language, setLanguage] = useState("Traditional Chinese");
   const [temperature, setTemperature] = useState(0.5);
   const [useModerator, setUseModerator] = useState(false);
   const [rateLimit, setRateLimit] = useState(50);
 
-  const [file, setFile] = useState<File | null>(null);
+  const translationControllerRef = useRef<TranslationController>();
 
-  const [resultUrl, setResultUrl] = useState<string | undefined>();
+  // const [file, setFile] = useState<File | null>(null);
+  // const [resultUrl, setResultUrl] = useState<string | undefined>();
 
   const [originalSRTText, setOriginalSRTText] = useState<string>();
   const [translatedSRTText, setTranslatedSRTText] = useState<string>();
-
-  const [originalSRTChunks, setOriginalSRTChunks] = useState<Array<string>>();
-  const [translatedSRTChunks, setTranslatedSRTChunks] = useState<Array<string>>();
 
   const [originalSRT, setOriginalSRT] = useState<Array<SRT>>();
   const [translatedSRT, setTranslatedSRT] = useState<Array<SRT>>();
 
   const [translateProgress, setTranslateProgress] = useState<number>(0);
   const [isTranslating, setIsTranslating] = useState<boolean>(false);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
 
   const onGenerate = async () => {
-    console.log("Generate");
     if (!originalSRTText) return;
-
-    setTranslatedSRTText('');
-    setTranslatedSRTChunks([]);
-    setTranslatedSRT([]);
-    setTranslateProgress(0);
-
-    try {
-
-      setIsTranslating(true);
-      const _chunks = splitText(originalSRTText);
-      setOriginalSRTChunks(_chunks);
-
-      const _translatedChunks = [];
-      for (let i = 0; i < _chunks.length; i++) {
-        const chunk = _chunks[i];
-        console.log(chunk);
-
-        const translated = await translateText(chunk, language, false, 1);
-        console.log(translated);
-        _translatedChunks.push(translated);
-
-        setTranslateProgress((i / _chunks.length) * 100);
-        setTranslatedSRTText(_translatedChunks.join('\n\n'));
-        // setTranslatedSRTText(_translatedChunks.join('\n\n'));
-      }
-
-      setTranslatedSRTChunks(_translatedChunks);
-    } catch (error) {
-      console.error(error);
-      alert("Error translating text");
-    } finally {
-      setIsTranslating(false);
+    if (translationControllerRef.current) {
+      translationControllerRef.current.off('progress');
+      translationControllerRef.current.off('complete');
+      translationControllerRef.current.off('start');
+      translationControllerRef.current.off('stop');
+      translationControllerRef.current.off('pause');
+      translationControllerRef.current.off('resume');
+      translationControllerRef.current.stop();
+      // destroy the controller
+      translationControllerRef.current = undefined;
     }
+
+    const controller = new TranslationController(originalSRTText, language);
+    translationControllerRef.current = controller;
+    controller.on('start', () => {
+      setIsTranslating(true);
+      setIsPaused(false);
+    });
+    controller.start();
   };
 
   const onFileSelect = (file: File) => {
-    console.log(file);
+    // console.log(file);
 
     // Read the file
     const reader = new FileReader();
@@ -94,7 +83,7 @@ export default function Home() {
 
     const blob = new Blob([_translatedSRTText], { type: 'text/plain' });
     const url = URL.createObjectURL(blob);
-    setResultUrl(url);
+    // setResultUrl(url);
 
     const a = document.createElement('a');
     a.href = url;
@@ -103,9 +92,13 @@ export default function Home() {
   }
 
   const onStopTranslate = () => {
-    // setIsTranslating(false);
-    // refresh the page
-    window.location.reload();
+    if (translationControllerRef.current) {
+      translationControllerRef.current.stop();
+      translationControllerRef.current = undefined;
+      setIsTranslating(false);
+      setIsPaused(false);
+      setTranslateProgress(0);
+    }
   }
 
   useEffect(() => {
@@ -113,7 +106,7 @@ export default function Home() {
 
     const srt = originalSRTText.split('\n\n').map((block, index) => {
       const lines = block.split('\n');
-      console.log(lines);
+      // console.log(lines);
       if (lines.length < 3) return { id: 0, start: '', end: '', text: '' };
       const id = parseInt(lines[0]);
       const [start, end] = lines[1].split(' --> ').map((time) => {
@@ -132,7 +125,7 @@ export default function Home() {
 
     const srt = translatedSRTText.split('\n\n').map((block, index) => {
       const lines = block.split('\n');
-      console.log(lines);
+      // console.log(lines);
       if (lines.length < 3) return { id: 0, start: '', end: '', text: '' };
       const id = parseInt(lines[0]);
       const [start, end] = lines[1].split(' --> ').map((time) => {
@@ -146,11 +139,61 @@ export default function Home() {
     setTranslatedSRT(srt);
   }, [translatedSRTText]);
 
+  useEffect(() => {
+    if (!translationControllerRef.current) return;
+    console.log('controller changed');
+
+    const controller = translationControllerRef.current;
+
+    controller.on('progress', (event: TranslationEvent) => {
+      console.log('progress', event.data.progress);
+      setTranslateProgress(event.data.progress);
+      setTranslatedSRTText(event.data.translatedSRTText);
+    });
+
+    controller.on('complete', (event: TranslationEvent) => {
+      setTranslateProgress(event.data.progress);
+      setTranslatedSRTText(event.data.translatedSRTText);
+      setIsTranslating(false);
+    });
+
+
+    controller.on('stop', () => {
+      setIsTranslating(false);
+      setIsPaused(false);
+    });
+    controller.on('pause', () => {
+      setIsTranslating(false);
+      setIsPaused(true);
+    });
+    controller.on('resume', () => {
+      setIsTranslating(true);
+      setIsPaused(false);
+    });
+
+
+    return () => {
+      if (translationControllerRef.current) {
+        translationControllerRef.current.off('progress');
+        translationControllerRef.current.off('complete');
+        translationControllerRef.current.off('start');
+        translationControllerRef.current.off('stop');
+        translationControllerRef.current.off('pause');
+        translationControllerRef.current.off('resume');
+        translationControllerRef.current.stop();
+        translationControllerRef.current = undefined;
+      }
+    }
+  }, [translationControllerRef.current]);
+
 
   return (
     <main className="flex min-h-screen flex-col p-6 gap-2">
       <div className="flex items-center justify-between w-full">
         <h1 className="text-2xl font-bold">SRT Translator /w chatgpt</h1>
+        <a href="https://github.com/kifhan/next-srt-translator" target="_blank" rel="noopener noreferrer">
+          <img src={githubLogo.src} alt="GitHub" className="w-8 h-8" />
+        </a>
       </div>
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex  grow-0">
         <TranslatorConfig
@@ -169,9 +212,15 @@ export default function Home() {
         <div className="flex items-end justify-between w-full">
           <FileUploadButton label="upload original SRT" onFileSelect={onFileSelect} />
           <div className="flex gap-4">
-            <ControlButton label={isTranslating ? `${translateProgress} %` : "Translate"} onClick={onGenerate} disabled={!originalSRTText || isTranslating} />
-            {/* {isTranslating && <div>{translateProgress} %</div>} */}
-            {isTranslating ? <ControlButton label="Stop" color="bg-red-500" onClick={onStopTranslate} /> : null}
+            {translationControllerRef.current ? <ProgressBar value={translateProgress} max={100} /> : null}
+            
+            {!translationControllerRef.current ? <ControlButton label="Start" color="bg-blue-500" onClick={onGenerate} /> : null}
+
+            {isTranslating ? <ControlButton label="Pause" color="bg-yellow-500" onClick={() => translationControllerRef.current?.pause()} /> : null}
+            {isPaused ? <ControlButton label="Resume" color="bg-green-500" onClick={() => translationControllerRef.current?.resume()} /> : null}
+
+            {/* {translationControllerRef.current ? <ControlButton label="Stop" color="bg-red-500" onClick={onStopTranslate} /> : null} */}
+
           </div>
           <FileDownloadButton label="Download" onClick={onDownload} disabled={!translatedSRT} />
         </div>

@@ -1,5 +1,8 @@
 const OPENAI_API_BASE = "https://api.openai.com/v1";
 const OPENAI_API_TYPE = "/chat/completions";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const GEMINI_KEY = process.env.GOOGLE_GEMINI_API_KEY || "";
 
 export async function POST(request: Request) {
     try {
@@ -24,3 +27,39 @@ export async function POST(request: Request) {
         return Response.json({ error: error.message }, { status: 500 })
     }
 }
+
+// export async function POST(request: Request) {
+//     try {
+//         const body = await request.json()
+
+//         const genAI = new GoogleGenerativeAI(GEMINI_KEY);
+//         const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+
+//         const chat = model.startChat({
+//             history: [
+//                 {
+//                     role: "user",
+//                     parts: [{ text: "Hello, I have 2 dogs in my house." }],
+//                 },
+//                 {
+//                     role: "model",
+//                     parts: [{ text: "Great to meet you. What would you like to know?" }],
+//                 },
+//             ],
+//             generationConfig: {
+//                 maxOutputTokens: 100,
+//             },
+//         });
+
+//         const msg = "How many paws are in my house?";
+
+//         const result = await chat.sendMessage(msg);
+//         const response = await result.response;
+//         const text = response.text();
+//         console.log(text);
+
+//     } catch (error) {
+
+//     }
+// }

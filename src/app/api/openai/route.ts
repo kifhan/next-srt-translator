@@ -1,6 +1,6 @@
 const OPENAI_API_BASE = "https://api.openai.com/v1";
 const OPENAI_API_TYPE = "/chat/completions";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+// import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const GEMINI_KEY = process.env.GOOGLE_GEMINI_API_KEY || "";
 

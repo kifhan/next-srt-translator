@@ -31,7 +31,9 @@ export function splitText(text: string) {
 export function isTranslationValid(originalText: string, translatedText: string) {
     function getIndexLines(text: string): [string[], number] {
         const lines = text.split('\n');
-        const indexLines = lines.filter(line => /^\d+$/.test(line.trim()));
+        const indexLines = lines.map(line => 
+            line.replaceAll(" ","").replaceAll("\t","") // Remove all spaces and tabs
+        ).filter(line => /^\d+$/.test(line.trim()));
         return [indexLines, indexLines.length];
     }
 

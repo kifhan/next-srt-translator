@@ -174,7 +174,7 @@ export default function Home() {
       <div className="flex items-center justify-between w-full">
         <h1 className="text-2xl font-bold">SRT Translator /w chatgpt</h1>
         <a href="https://github.com/kifhan/next-srt-translator" target="_blank" rel="noopener noreferrer">
-          <Image src={githubLogo.src} alt="GitHub" className="w-8 h-8" />
+          <Image src={githubLogo.src} alt="GitHub" className="w-8 h-8" width={32} height={32} />
         </a>
       </div>
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex  grow-0">

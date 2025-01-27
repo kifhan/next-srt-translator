@@ -2,7 +2,7 @@ const DEFAULT_MODEL = "gpt-4o-mini";
 // const DEFAULT_MODEL = "gpt-3.5-turbo";
 
 export type ChatGPTMessage = {
-    role: 'user' | 'assistant';
+    role: 'user' | 'assistant' | 'system';
     content: string;
 };
 
@@ -12,18 +12,23 @@ export interface OpenAIStreamPayload {
     api_url?: string;
     req_path?: string;
     api_key?: string;
+    response_format?: {
+        type: 'text' | 'json_schema' | 'json_object';
+        json_schema?: any;
+    };
 }
 
 export async function OpenAIStream({ 
     model = DEFAULT_MODEL, 
     messages,
+    response_format = {type: 'text'},
  }: OpenAIStreamPayload) {
     const res = await fetch("/api/openai", {
         headers: {
             "Content-Type": "application/json",
         },
         method: "POST",
-        body: JSON.stringify({ model, messages }),
+        body: JSON.stringify({ model, messages, response_format }),
     });
 
     const stream = await res.json();

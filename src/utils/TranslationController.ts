@@ -1,6 +1,6 @@
 import { splitText, translateText } from "./srt_process";
 
-interface TranslationEventListeners {
+export interface TranslationEventListeners {
     [key: string]: any;
 }
 
@@ -10,18 +10,18 @@ export interface TranslationEvent {
 }
 
 class TranslationController {
-    private _isTranslating: boolean = false;
-    private _isPaused: boolean = false;
-    private _currentIndex: number = 0;
-    private _progress: number = 0;
-    private _translatedSRTText: string = '';
-    private _originalChunks: string[] = [];
-    private _translatedChunks: string[] = [];
-    private _generator: any;
-    private _language: string;
-    private _listeners: TranslationEventListeners;
+    _isTranslating: boolean = false;
+    _isPaused: boolean = false;
+    _currentIndex: number = 0;
+    _progress: number = 0;
+    _translatedSRTText: string = '';
+    _originalChunks: string[] = [];
+    _translatedChunks: string[] = [];
+    _generator: any;
+    _language: string;
+    _listeners: TranslationEventListeners;
 
-    private _verbose: boolean = true;
+    _verbose: boolean = true;
 
     get isTranslating(): boolean {
         return this._isTranslating;

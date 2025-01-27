@@ -55,8 +55,6 @@ export async function translateText(text: string, languageName: string, skipErro
 
     while (retries < maxRetries) {
         try {
-            // Simulate calling a translation API
-            // Replace this with your actual API call and response handling
             let content = await OpenAIStream({
                 messages: [
                     { role: 'user', content: `Translate the following subtitle text into ${languageName}, but keep the subtitle number and timeline unchanged, with result only:` },

@@ -82,8 +82,6 @@ export default function Home() {
   };
 
   const onFileSelect = (file: File) => {
-    // console.log(file);
-
     // Read the file
     const reader = new FileReader();
     // turn file into SRT[]
@@ -91,10 +89,8 @@ export default function Home() {
       let content = e.target?.result as string;
       // /r/n -> /n
       content = content.replace(/\r\n/g, '\n');
-
       setOriginalSRTText(content);
     };
-
     reader.readAsText(file);
   }
 

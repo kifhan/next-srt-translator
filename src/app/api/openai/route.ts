@@ -14,10 +14,15 @@ export async function POST(request: Request) {
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+                // 'OpenAI-Organization': `${process.env.OPENAI_ORG_ID}`,
+                // 'OpenAI-Project': `${process.env.OPENAI_PROJECT_ID}`,
             }
         });
 
+        console.log(response.headers);
+
         if (!response.ok) {
+            console.log( await response.json());
             throw new Error('Network response was not ok');
         }
 

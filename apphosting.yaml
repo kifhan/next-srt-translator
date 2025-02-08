@@ -8,16 +8,51 @@ runConfig:
   memoryMiB: 512
 
 # Environment variables and secrets.
-# env:
-  # Configure environment variables.
-  # See https://firebase.google.com/docs/app-hosting/configure#user-defined-environment
-  # - variable: MESSAGE
-  #   value: Hello world!
-  #   availability:
-  #     - BUILD
-  #     - RUNTIME
+env:
+  - variable: OPENAI_PROJECT_ID
+    secret: projects/213930440336/secrets/OPENAI_PROJECT_ID
+  - variable: OPENAI_ORG_ID
+    secret: projects/213930440336/secrets/OPENAI_ORG_ID
+  - variable: OPENAI_API_KEY
+    secret: projects/213930440336/secrets/OPENAI_API_KEY
 
-  # Grant access to secrets in Cloud Secret Manager.
-  # See https://firebase.google.com/docs/app-hosting/configure#secret-parameters
-  # - variable: MY_SECRET
-  #   secret: mySecretRef
+  - variable: NEXT_PUBLIC_GOOGLE_MAP_API
+    value: AIzaSyDtDDeGImenaclJF6Ba8jGIrB7PNL8qylk
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_API_KEY
+    value: AIzaSyBZuTpt3J_IYhZlEl6X0kM2dIgd47yzonk
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN
+    value: takecaption-18065.firebaseapp.com
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_PROJECT_ID
+    value: takecaption-18065
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET
+    value: takecaption-18065.firebasestorage.app
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+    value: 213930440336
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_APP_ID
+    value: 1:213930440336:web:60e7b414a7314c996cca15
+    availability:
+      - BUILD
+      - RUNTIME
+  - variable: NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+    value: G-7M2BF98CB4
+    availability:
+      - BUILD
+      - RUNTIME

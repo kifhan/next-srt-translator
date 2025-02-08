@@ -1,3 +1,5 @@
+import { gptModelChoice } from "@/types";
+import { translateCaptionGemini } from "./gemini";
 import { OpenAIRequest } from "./OpenAI";
 
 const MAX_RETRY = 3;
@@ -31,8 +33,8 @@ export function splitText(text: string) {
 export function isTranslationValid(originalText: string, translatedText: string) {
     function getIndexLines(text: string): [string[], number] {
         const lines = text.split('\n');
-        const indexLines = lines.map(line => 
-            line.replaceAll(" ","").replaceAll("\t","") // Remove all spaces and tabs
+        const indexLines = lines.map(line =>
+            line.replaceAll(" ", "").replaceAll("\t", "") // Remove all spaces and tabs
         ).filter(line => /^\d+$/.test(line.trim()));
         return [indexLines, indexLines.length];
     }
@@ -41,29 +43,40 @@ export function isTranslationValid(originalText: string, translatedText: string)
     const [translatedIndexLines, translateLineLen] = getIndexLines(translatedText);
 
     // Log the texts and index lines for debugging (equivalent to print statements in Python)
-    console.log(originalText);
-    console.log(translatedText);
-    console.log(originalIndexLines);
-    console.log(translatedIndexLines);
+    // console.log(originalText);
+    // console.log(translatedText);
+    // console.log(originalIndexLines);
+    // console.log(translatedIndexLines);
+    console.log("check:", originalLineLen === translateLineLen);
 
     return originalIndexLines.join(',') === translatedIndexLines.join(',');
 }
 
 
-export async function translateText(text: string, languageName: string, skipError: boolean = true, maxRetries: number = MAX_RETRY) {
+export async function translateText(
+    text: string, languageName: string, skipError: boolean = true, maxRetries: number = MAX_RETRY,
+    model: gptModelChoice = "openai"
+): Promise<string> {
     let retries = 0;
 
     while (retries < maxRetries) {
         try {
-            let content = await OpenAIRequest({
-                messages: [
-                    { role: 'user', content: `Translate the following subtitle text into ${languageName}, but keep the subtitle number and timeline unchanged, with result only:` },
-                    { role: 'user', content: text },
-                    { role: 'assistant', content: `Subtitle translation into ${languageName} is as follows:` }
-                ]
-            });
-            // let tText = new TextDecoder("utf-8").decode(content);
-            let tText = content;
+            let tText = "";
+            if (model === "openai") {
+                let content = await OpenAIRequest({
+                    messages: [
+                        { role: 'user', content: `Translate the following subtitle text into ${languageName}, but keep the subtitle number and timeline unchanged, with result only:` },
+                        { role: 'user', content: text },
+                        { role: 'assistant', content: `Subtitle translation into ${languageName} is as follows:` }
+                    ]
+                });
+                tText = content;
+            }
+            if (model === "gemini") {
+                tText = await translateCaptionGemini({
+                    message: `Translate the following subtitle text into ${languageName}, but keep the subtitle number and timeline unchanged, no additional punctuation, with result only: \n\n ${text}`
+                })
+            }
 
             if (isTranslationValid(text, tText)) {
                 return tText;

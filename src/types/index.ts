@@ -22,3 +22,5 @@ export interface MarkerData {
 }
 
 export type MarkerIconType = "info" | "me" | "jellyfish" | "jellyfishJump" | "alien" | "devil" | "exploding" | "ghost" | "poo" | "robot";
+
+export type gptModelChoice = 'openai' | 'gemini';

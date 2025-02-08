@@ -19,6 +19,7 @@ export default function Home() {
   const [temperature, setTemperature] = useState(0.5);
   const [useModerator, setUseModerator] = useState(false);
   const [rateLimit, setRateLimit] = useState(50);
+  const [gptModel, setGptModel] = useState<"openai" | "gemini">("openai");
 
   const translationControllerRef = useRef<TranslationController>(undefined);
 
@@ -49,7 +50,7 @@ export default function Home() {
       translationControllerRef.current = undefined;
     }
 
-    const controller = new TranslationController(originalSRTText, language);
+    const controller = new TranslationController(originalSRTText, language, gptModel);
     translationControllerRef.current = controller;
 
     controller.on('progress', (event: TranslationEvent) => {
@@ -149,11 +150,14 @@ export default function Home() {
   useEffect(() => {
     if (!translatedSRTText) return;
 
+    console.log("translatedSRTText", translatedSRTText);
+
     const srt = translatedSRTText.split('\n\n').map((block, index) => {
       const lines = block.split('\n');
       // console.log(lines);
       if (lines.length < 3) return { id: 0, start: '', end: '', text: '' };
-      const id = parseInt(lines[0]);
+      let id = parseInt(lines[0]);
+      if (Number.isNaN(id)) id = index + 1;
       const [start, end] = lines[1].split(' --> ').map((time) => {
         return time;
       });
@@ -168,7 +172,7 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col p-6 gap-2">
       <div className="flex items-center justify-between w-full">
-        <h1 className="text-2xl font-bold">SRT Translator /w chatgpt</h1>
+        <h1 className="text-2xl font-bold">TakeCaption</h1>
         <a href="https://github.com/kifhan/next-srt-translator" target="_blank" rel="noopener noreferrer">
           <Image src={githubLogo.src} alt="GitHub" className="w-8 h-8" width={32} height={32} />
         </a>
@@ -183,6 +187,8 @@ export default function Home() {
           setUseModerator={setUseModerator}
           rateLimit={rateLimit}
           setRateLimit={setRateLimit}
+          gptModel={gptModel}
+          setGptModel={setGptModel}
           onGenerate={onGenerate}
         />
       </div>

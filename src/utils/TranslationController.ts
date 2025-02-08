@@ -1,3 +1,4 @@
+import { gptModelChoice } from "@/types";
 import { splitText, translateText } from "./srt_process";
 
 export interface TranslationEventListeners {
@@ -6,7 +7,10 @@ export interface TranslationEventListeners {
 
 export interface TranslationEvent {
     type: string;
-    data: any;
+    data: {
+        progress: number;
+        translatedSRTText: string;
+    };
 }
 
 class TranslationController {
@@ -20,6 +24,7 @@ class TranslationController {
     _generator: any;
     _language: string;
     _listeners: TranslationEventListeners;
+    _model: gptModelChoice;
 
     _verbose: boolean = true;
 
@@ -43,8 +48,9 @@ class TranslationController {
         return this._language;
     }
 
-    constructor(originalText: string, language: string) {
+    constructor(originalText: string, language: string, model: gptModelChoice) {
         this._language = language;
+        this._model = model;
 
         const data = splitText(originalText);
 
@@ -95,9 +101,12 @@ class TranslationController {
         try {
             if (this._verbose) console.log('Translating chunk...', this._currentIndex)
 
-            const translated = await translateText(chunk, this._language, false, 3);
-            this._translatedChunks.push(translated);
-            this._translatedSRTText = this._translatedChunks.join('\n\n');
+            const translated = await translateText(chunk, this._language, false, 3, this._model);
+            let _translated = translated.endsWith('\n') ? translated.replace(/\n$/, '') : translated;
+            _translated = _translated.startsWith('\n') ? _translated.replace(/^\n/, '') : _translated;
+            this._translatedChunks.push(_translated);
+            // this._translatedSRTText = this._translatedChunks.join('\n'); // when using gemini
+            this._translatedSRTText = this._translatedChunks.join('\n\n'); // when using openai
             this._progress = (this._currentIndex / this._originalChunks.length) * 100;
             this._currentIndex++;
 

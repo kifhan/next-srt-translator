@@ -1,3 +1,5 @@
+"use server";
+
 const OPENAI_API_BASE = "https://api.openai.com/v1";
 const OPENAI_API_TYPE = "/chat/completions";
 // import { GoogleGenerativeAI } from "@google/generative-ai";

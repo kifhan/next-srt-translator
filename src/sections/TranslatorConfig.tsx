@@ -4,6 +4,7 @@ import Switch from '@/components/Switch';
 import InputNumber from '@/components/InputNumber';
 
 import React, { ChangeEvent, useState } from 'react';
+import { gptModelChoice } from '@/types';
 
 const LANGUAGE_CHOICES = [
     // 'Spanish',
@@ -25,6 +26,10 @@ interface TranslatorProps {
     setUseModerator: (value: boolean) => void;
     rateLimit: number;
     setRateLimit: (value: number) => void;
+
+    gptModel: gptModelChoice;
+    setGptModel: (model: gptModelChoice) => void;
+
     onGenerate: () => void;
 }
 
@@ -37,6 +42,8 @@ const TranslatorConfig: React.FC<TranslatorProps> = ({
     setUseModerator,
     rateLimit,
     setRateLimit,
+    gptModel,
+    setGptModel,
     onGenerate
 }: TranslatorProps) => {
     const generate = (e: ChangeEvent<HTMLFormElement>) => {
@@ -44,6 +51,10 @@ const TranslatorConfig: React.FC<TranslatorProps> = ({
         console.log('Generating...');
         onGenerate();
     }
+
+    const gptModelChoices = [
+        'openai', 'gemini'
+    ];
 
     return (
         <div className="flex flex-col w-full">
@@ -55,7 +66,7 @@ const TranslatorConfig: React.FC<TranslatorProps> = ({
                         </div>
                     </div>
                     <div className="p-4">
-                        <div className='flex justify-between w-full' style={{gap: "12px"}}>
+                        <div className='flex justify-between w-full' style={{ gap: "12px" }}>
 
                             <div className='flex w-full'>
                                 <Select
@@ -65,6 +76,16 @@ const TranslatorConfig: React.FC<TranslatorProps> = ({
                                     onChange={(value: string) => setLanguage(value)}
                                 />
                             </div>
+
+                            <div className='flex w-full'>
+                                <Select
+                                    label="GPT Model"
+                                    options={gptModelChoices}
+                                    value={gptModel}
+                                    onChange={(value: string) => setGptModel(value as gptModelChoice)}
+                                />
+                            </div>
+
                             {/* <div className='w-full md:w-3/12'>
                                 <Slider
                                     label="Temperature"

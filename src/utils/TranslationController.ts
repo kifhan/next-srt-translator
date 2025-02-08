@@ -5,15 +5,17 @@ export interface TranslationEventListeners {
     [key: string]: any;
 }
 
-export interface TranslationEvent {
-    type: string;
-    data: {
-        progress: number;
-        translatedSRTText: string;
-    };
+export interface TranslationEventData {
+    progress: number;
+    translatedSRTText: string;
 }
 
-class TranslationController {
+export interface TranslationEvent<T> {
+    type: string;
+    data: T;
+}
+
+class TranslationController<T = any> {
     _isTranslating: boolean = false;
     _isPaused: boolean = false;
     _currentIndex: number = 0;
@@ -91,7 +93,7 @@ class TranslationController {
         }
     }
 
-    emit(event: string, data: TranslationEvent) {
+    emit(event: string, data: TranslationEvent<T>) {
         if (this._listeners[event]) {
             this._listeners[event].forEach((callback: any) => callback(data));
         }
@@ -115,7 +117,7 @@ class TranslationController {
                 data: {
                     progress: this._progress,
                     translatedSRTText: this._translatedSRTText
-                }
+                } as T
             });
 
             return translated;
@@ -134,7 +136,7 @@ class TranslationController {
                 data: {
                     progress: this._progress,
                     translatedSRTText: this._translatedSRTText
-                }
+                } as T
             });
 
             this._isTranslating = true;
@@ -164,7 +166,7 @@ class TranslationController {
                 data: {
                     progress: this._progress,
                     translatedSRTText: this._translatedSRTText
-                }
+                } as T
             });
             return;
         }
@@ -183,7 +185,7 @@ class TranslationController {
                 data: {
                     progress: this._progress,
                     translatedSRTText: this._translatedSRTText
-                }
+                } as T
             });
         }
     }
@@ -198,7 +200,7 @@ class TranslationController {
                 data: {
                     progress: this._progress,
                     translatedSRTText: this._translatedSRTText
-                }
+                } as T
             });
             this.next();
         }

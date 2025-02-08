@@ -1,13 +1,17 @@
+import { gptModelChoice } from "@/types";
 import { generateMarkers } from "./marker_process";
 import TranslationController from "./TranslationController";
 
-
+export interface MarkerGenerationEventData {
+    progress: number;
+    generatedMarkers: any[];
+}
 class MarkerGenerator extends TranslationController {
 
     _generatedMarkers: any[] = [];
 
-    constructor(originalSRTText: string, language: string) {
-        super(originalSRTText, language);
+    constructor(originalSRTText: string, language: string, model: gptModelChoice = 'openai' ) {
+        super(originalSRTText, language, model);
 
         this._generatedMarkers = [];
     }

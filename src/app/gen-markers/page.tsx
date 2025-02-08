@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 import MpasView from '@/components/maps/MpasView'
-import MarkerGenerator from '@/utils/MarkerGenerator';
+import MarkerGenerator, { MarkerGenerationEventData } from '@/utils/MarkerGenerator';
 import SRTTable, { SRT } from '@/components/srt/SRTTable';
 import { TranslationEvent } from '@/utils/TranslationController';
 import FileUploadButton from '@/components/FileUploadButton';
@@ -40,12 +40,12 @@ export default function Page() {
         const controller = new MarkerGenerator(originalSRTText, '');
         generationControllerRef.current = controller;
 
-        controller.on('progress', (event: TranslationEvent) => {
+        controller.on('progress', (event: TranslationEvent<MarkerGenerationEventData>) => {
             console.log('progress', event.data.progress);
             setTranslateProgress(event.data.progress);
             setGeneratedMarkers(event.data.generatedMarkers);
         });
-        controller.on('complete', (event: TranslationEvent) => {
+        controller.on('complete', (event: TranslationEvent<MarkerGenerationEventData>) => {
             setTranslateProgress(event.data.progress);
             setGeneratedMarkers(event.data.generatedMarkers);
             setIsTranslating(false);

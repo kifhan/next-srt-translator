@@ -8,7 +8,7 @@ import SRTTable, { SRT } from "@/components/srt/SRTTable";
 import { splitText, translateText } from "@/utils/srt_process";
 import ControlButton from "@/components/ControlButton";
 
-import TranslationController, { TranslationEvent } from "@/utils/TranslationController";
+import TranslationController, { TranslationEvent, TranslationEventData } from "@/utils/TranslationController";
 import ProgressBar from "@/components/ProgressBar";
 
 import githubLogo from "@/assets/github-mark.png";
@@ -53,12 +53,12 @@ export default function Home() {
     const controller = new TranslationController(originalSRTText, language, gptModel);
     translationControllerRef.current = controller;
 
-    controller.on('progress', (event: TranslationEvent) => {
+    controller.on('progress', (event: TranslationEvent<TranslationEventData>) => {
       console.log('progress', event.data.progress);
       setTranslateProgress(event.data.progress);
       setTranslatedSRTText(event.data.translatedSRTText);
     });
-    controller.on('complete', (event: TranslationEvent) => {
+    controller.on('complete', (event: TranslationEvent<TranslationEventData>) => {
       setTranslateProgress(event.data.progress);
       setTranslatedSRTText(event.data.translatedSRTText);
       setIsTranslating(false);

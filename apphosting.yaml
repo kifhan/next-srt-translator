@@ -11,10 +11,19 @@ runConfig:
 env:
   - variable: OPENAI_PROJECT_ID
     secret: projects/213930440336/secrets/OPENAI_PROJECT_ID
+    availability:
+      - BUILD
+      - RUNTIME
   - variable: OPENAI_ORG_ID
     secret: projects/213930440336/secrets/OPENAI_ORG_ID
+    availability:
+      - BUILD
+      - RUNTIME
   - variable: OPENAI_API_KEY
     secret: projects/213930440336/secrets/OPENAI_API_KEY
+    availability:
+      - BUILD
+      - RUNTIME
 
   - variable: NEXT_PUBLIC_GOOGLE_MAP_API
     value: AIzaSyDtDDeGImenaclJF6Ba8jGIrB7PNL8qylk

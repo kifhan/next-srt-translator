@@ -1,35 +1,45 @@
 "use server";
 
-const OPENAI_API_BASE = "https://api.openai.com/v1";
-const OPENAI_API_TYPE = "/chat/completions";
-// import { GoogleGenerativeAI } from "@google/generative-ai";
-
-const GEMINI_KEY = process.env.GOOGLE_GEMINI_API_KEY || "";
+import OpenAI from 'openai';
 
 export async function POST(request: Request) {
     try {
         const body = await request.json()
 
-        const response = await fetch(`${OPENAI_API_BASE}${OPENAI_API_TYPE}`, {
-            method: 'POST',
-            body: JSON.stringify(body),
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-                // 'OpenAI-Organization': `${process.env.OPENAI_ORG_ID}`,
-                // 'OpenAI-Project': `${process.env.OPENAI_PROJECT_ID}`,
-            }
+        const client = new OpenAI({
+            // apiKey: process.env['OPENAI_API_KEY'], // This is the default and can be omitted
+            apiKey: process.env['OPENAI_API_KEY_NEW'],
+            organization: process.env['OPENAI_ORG_ID'],
+            project: process.env['OPENAI_PROJECT_ID'],
         });
+        const chatCompletion = await client.chat.completions.create({
+            ...body
+            // messages: [{ role: 'user', content: 'Say this is a test' }],
+            // model: 'gpt-4o',
+          });
 
-        console.log(response.headers);
+          return Response.json(chatCompletion);
 
-        if (!response.ok) {
-            console.log( await response.json());
-            throw new Error('Network response was not ok');
-        }
+        // const response = await fetch(`${OPENAI_API_BASE}${OPENAI_API_TYPE}`, {
+        //     method: 'POST',
+        //     body: JSON.stringify(body),
+        //     headers: {
+        //         'Content-Type': 'application/json',
+        //         'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        //         // 'OpenAI-Organization': `${process.env.OPENAI_ORG_ID}`,
+        //         // 'OpenAI-Project': `${process.env.OPENAI_PROJECT_ID}`,
+        //     }
+        // });
 
-        const data = await response.json();
-        return Response.json(data)
+        // console.log(response.headers);
+
+        // if (!response.ok) {
+        //     console.log( await response.json());
+        //     throw new Error('Network response was not ok');
+        // }
+
+        // const data = await response.json();
+        // return Response.json(data)
     } catch (error: any) {
         return Response.json({ error: error.message }, { status: 500 })
     }

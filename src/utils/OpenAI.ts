@@ -33,12 +33,12 @@ export async function OpenAIRequest({
         body: JSON.stringify({ model, messages, response_format }),
     });
 
-    const stream = await res.json();
+    const data = await res.json();
 
     try {
-        console.log(stream);
-        if (stream.error) return stream.error.message;
-        return stream?.choices[0]?.message?.content || ''
+        console.log(data);
+        if (data.error) return data.error.message;
+        return data?.choices[0]?.message?.content || ''
     } catch (e) {
         return e
     }

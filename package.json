@@ -19,6 +19,7 @@
     "genkit": "^1.0.4",
     "import-in-the-middle": "^1.13.0",
     "next": "15.1.6",
+    "openai": "^4.83.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "require-in-the-middle": "^7.5.1",

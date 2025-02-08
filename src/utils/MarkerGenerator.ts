@@ -22,14 +22,17 @@ class MarkerGenerator extends TranslationController {
 
     async generateProcess(chunk: string) {
         try {
-            if (this._verbose) console.log('Translating chunk', chunk);
+            // if (this._verbose) console.log('Translating chunk', chunk);
 
             const generated = await generateMarkers(chunk);
             const markers = JSON.parse(generated);
+
+            if (this._verbose) console.log('generateMarkers', markers);
             if (markers.status !== 'Success') {
-                throw new Error('Failed to generate markers');
+                // throw new Error('Failed to generate markers');
+                console.log('Failed to generate markers', markers);
             }
-            this._generatedMarkers.concat(markers.results);
+            this._generatedMarkers.push(...markers.results);
 
             this._translatedChunks.push(generated);
 

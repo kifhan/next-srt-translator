@@ -1,5 +1,5 @@
-const DEFAULT_MODEL = "o1-mini";
-// const DEFAULT_MODEL = "o3-mini";
+// const DEFAULT_MODEL = "o1-mini";
+const DEFAULT_MODEL = "o3-mini";
 // const DEFAULT_MODEL = "gpt-4o-mini";
 // const DEFAULT_MODEL = "gpt-3.5-turbo";
 
@@ -20,7 +20,7 @@ export interface OpenAIStreamPayload {
     };
 }
 
-export async function OpenAIStream({ 
+export async function OpenAIRequest({ 
     model = DEFAULT_MODEL, 
     messages,
     response_format = {type: 'text'},

@@ -1,4 +1,4 @@
-import { OpenAIStream } from "./OpenAI";
+import { OpenAIRequest } from "./OpenAI";
 
 const MAX_RETRY = 3;
 
@@ -55,7 +55,7 @@ export async function translateText(text: string, languageName: string, skipErro
 
     while (retries < maxRetries) {
         try {
-            let content = await OpenAIStream({
+            let content = await OpenAIRequest({
                 messages: [
                     { role: 'user', content: `Translate the following subtitle text into ${languageName}, but keep the subtitle number and timeline unchanged, with result only:` },
                     { role: 'user', content: text },

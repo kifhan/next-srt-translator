@@ -20,7 +20,7 @@ export default function Home() {
   const [useModerator, setUseModerator] = useState(false);
   const [rateLimit, setRateLimit] = useState(50);
 
-  const translationControllerRef = useRef<TranslationController>();
+  const translationControllerRef = useRef<TranslationController>(undefined);
 
   // const [file, setFile] = useState<File | null>(null);
   // const [resultUrl, setResultUrl] = useState<string | undefined>();
